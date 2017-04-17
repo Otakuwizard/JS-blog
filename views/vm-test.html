@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block main %}
+<script>
+$(function(){
+    var vmForm = new Vue({
+        el: '#vm-form',
+        data: {
+            name: '',
+            age: '18'
+            //ageOptions: ['10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
+        }
+    });
+
+    window.vmForm = vmForm;
+
+    var vmCode = new Vue({
+        el: '#code-form',
+        data: {
+            text: ''
+        },
+        methods: {
+            excute: function(){
+                try {
+                    var code = $('#code').val();
+                    var fn = new Function('var vm = window.vmForm;\n' + code);
+                    fn();
+                } catch (error) {
+                    return false;
+                }
+            }
+        }
+    });
+});
+
+/*function excute(){
+        try {
+            var code = $('#code').val();
+            var fn = new Function('var vm = window.vmForm;\n' + code);
+            fn();
+        } catch (error) {
+            return false;
+        }    
+}*/
+</script>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Try Vue</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Typing your code and excute</h3>
+                </div>
+                <div class="panel-body">
+                    <form id="code-form" action="#" v-on:submit.prevent="excute">
+                        <div class="form-group">
+                            <textarea id="code" class="form-control" style="font-family: Meno,Monaco,Consolas,'Courier New',monospace; resize:none;" rows="5"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Excute</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-defualt">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Form bind with Vue</h3>
+                </div>
+                <div class="panel-body">
+                    <form id="vm-form" action="#">
+                        <div class="form-group">
+                            <input type="text" v-model="name">
+                        </div>
+                        <div class="form-group">
+                            <select v-model="age" name="age">
+                                <option  value="10">10</option>
+                                <option  value="11">11</option>
+                                <option  value="12">12</option>
+                                <option  value="13">13</option>
+                                <option  value="14">14</option>
+                                <option  value="15">15</option>
+                                <option  value="16">16</option>
+                                <option  value="17">17</option>
+                                <option  value="18">18</option>
+                                <option  value="19">19</option>
+                                <option  value="20">20</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,259 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="learn javascript by www.liaoxuefeng.com">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquery.form.js"></script>
+    <script src="/static/js/all.js"></script>
+    <script src="https://unpkg.com/vue@2.0.1/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+    <script src="/static/js/excel.js"></script>
+    <style>
+
+#sheet {
+    table-layout: fixed;
+    min-width: auto;
+    margin-bottom: 0px;
+}
+
+#sheet tr>th{
+    width: 150px;
+    background-color: #e6e6e6;
+}
+
+#sheet tr>th:first-child {
+    width: 50px;
+    background-color: #e6e6e6;
+}
+
+#sheet tr>td {
+    width: 150px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: none;
+    word-wrap: normal;
+    white-space: nowrap;
+}
+
+#sheet tr>td:first-child {
+    width: 50px;
+}
+
+    </style>
+    <script>
+    const COLUMS = 12;
+    const ROWS = 100;
+
+    function showError(err){
+        alert('Error: ' + JSON.stringify(err));
+    }
+    function createHeader(){
+        var header = [{
+            row: 0,
+            col: 0,
+            content: '',
+        }];
+        for(let i=1; i<COLUMS; i++){
+            header.push({
+                row: 0,
+                col: i,
+                content: String.fromCharCode(64+i),
+            })
+        }
+        return header;
+    }
+
+    function createRow(row){
+        var r = [{
+            row: row,
+            col: 0,
+            content: '' + row,
+            contentEditable: false,
+            align: 'left'
+        }];
+        for(let i=1; i<COLUMS; i++){
+            r.push({
+                row: row,
+                col: i,
+                content: '',
+                contentEditable: true,
+                align: 'left'
+            })
+        }
+        return r
+    }
+
+    function createRows(){
+        var rows = [];
+        for(let i=0; i<ROWS; i++){
+            rows.push(createRow(i));
+        }
+        return rows;
+    }
+
+    $(function(){
+        var vm = new Vue({
+            el: '#sheet',
+            data: {
+                title: 'New Sheet',
+                header:createHeader(),
+                rows: createRows(),
+                selectedRowIndex: 0,
+                selectedColIndex: 0
+            },
+            methods: {
+                focus: function(cell){
+                    this.selectedRowIndex = cell.row;
+                    this.selectedColIndex = cell.col;
+                },
+
+                change: function(e){
+                    var 
+                        rowIndex = this.selectedRowIndex,
+                        colIndex = this.selectedColIndex;
+                    if(colIndex > 0){
+                        this.rows[rowIndex][colIndex].content = e.target.innerText;
+                    }
+                },
+
+                setAlign: function(align){
+                    var
+                        rowIndex = this.selectedRowIndex,
+                        colIndex = this.selectedColIndex;
+                    if(colIndex > 0){
+                        this.rows[rowIndex][colIndex].align = align;
+                    }
+                },
+
+                open: function(){
+                    var that = this;
+                    that.$resource('/api/excel').get().then(function(resp){
+                        resp.json().then(function(result){
+                            that.rows = result.tables;
+                        });
+                    }, showError);
+                },
+
+                save: function(){
+                    var that = this;
+                    that.$resource('api/excel').save({
+                        tables: that.rows
+                    }).then(function(resp){
+                        resp.json().then(function(result){
+                            that.rows = result.tables;
+                        });
+                    }, showError);
+                },
+
+                download: function(){}
+                
+            }
+        });
+        window.vm = vm;
+
+        $('#cmd-left').click(function(){
+            vm.setAlign('left');
+        });
+
+        $('#cmd-center').click(function(){
+            vm.setAlign('center');
+        });
+
+        $('#cmd-right').click(function(){
+            vm.setAlign('right');
+        });
+
+        $('#cmd-open').click(function(){
+            vm.open();
+        });
+
+        $('#cmd-save').click(function(){
+            vm.save();
+        });
+
+        $('#cmd-download').click(function(){
+            vm.download();
+        });
+
+    });
+
+    </script>
+</head>
+
+<body>
+    <header class="navbar navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="/" class="navbar-brand">Home</a>
+            </div>
+            <nav class="collapse navbar-collapse" id="bs-navbar">
+                <ul class="nav navbar-nav">
+                    <li><a target="_blank" href="http://www.youtube.com">youtube</a></li>
+                    <li><a target="_blank" href="https://github.com/Otakuwizard/Webchatroom-by-node.js-with-websocket">Source Code</a></li>
+                    <li><a target="_blank" href="http://getbootstrap.com/">Resource</a></li>
+                    <li><a target="_blank" href="/vm-test">MVVM-test</a></li>
+                    <li><a target="_blank" href="/todolist">todolist</a></li>
+                </ul>
+                <div class="btn-group">
+                    <button id="cmd-open" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-folder-open"></i>Open</button>
+                    <button id="cmd-save" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-folder-disk"></i>Save</button>
+                    <button id="cmd-download" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-folder-save"></i>Download</button>
+                </div>
+                <div class="btn-group">
+                    <button id="cmd-left" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-align-left"></i></button>
+                    <button id="cmd-center" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-align-center"></i></button>
+                    <button id="cmd-right" type="button" class="btn btn-default navbar-btn"><i class="glyphicon glyphicon-align-right"></i></button>
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/signout">Sign Out</a></li>
+                    <li><a href="/register">Register</a><li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <!--<div id="important" style="color:#E0FFFF; background-color:#4682B4; padding:30px 0; margin:-20px 0 20px 0;">
+        <div class="container">
+            <h1 style="color:#fff; font-size:60px">Webchatroom project by websocket</h1>
+            <p style="font-size:24px; line-height:48px">Very intresting</p>
+        </div>
+    </div>-->
+
+
+    <div class="container">
+        <div id="important" style="position:absolute; margin:50px 0 35px 0; left: 0; right: 0; top: 0; bottom: 0; overflow:scroll;">
+            <table id="sheet" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th v-for="h in header" v-text="h.content"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="r in rows">
+                        <td v-for="cell in r" v-bind:style="{textAlign: cell.align}" v-on:click="focus(cell)" v-on:blur="change" v-bind:contenteditable="cell.contentEditable" v-text="cell.content"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+                        
+
+
+    <footer class="navbar navbar-fixed-bottom" style="background-color:#e7e7e7; height:35px; min-height:35px; overflow:hidden;">
+        <div class="container-fluid">
+            <nav class="collapse navbar-collapse">
+                <p>
+                    <a target="_blank" href="https://www.douban.com/people/Otakuwizard/">Douban</a> -
+                    <a target="_blank" href="https://github.com/michaelliao/learn-javascript">GitHub</a> -
+                    <a target_"_blank" href="http://www.weibo.com/u/2319626291?refer_flag=1001030101_&is_hot=1">Weibo</a>
+                    This Website is made by <a target="_blank" href="http://www.weibo.com/u/2319626291">@Feng Zijun</a>
+                    Code licensed <a target="_blank" href="https://github.com/michaelliao/learn-javascript/blob/master/LICENSE">Apache</a>
+                </p>
+            </nav>
+        </div>
+    </footer>
+</body>
+</html>

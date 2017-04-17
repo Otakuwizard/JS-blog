@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="learn javascript by www.liaoxuefeng.com">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquery.form.js"></script>
+    <script src="/static/js/all.js"></script>
+    <script src="https://unpkg.com/vue@2.0.1/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+    <script src="/static/js/sha1.min.js"></script>
+    <script src="/static/js/md5.min.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+</head>
+
+<body>
+    <header class="navbar navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="/" class="navbar-brand">Home</a>
+            </div>
+            <nav class="collapse navbar-collapse" id="bs-navbar">
+                <ul class="nav navbar-nav">
+                    <li><a target="_blank" href="http://www.youtube.com">youtube</a></li>
+                    <li><a target="_blank" href="https://github.com/Otakuwizard/Webchatroom-by-node.js-with-websocket">Source Code</a></li>
+                    <li><a target="_blank" href="http://getbootstrap.com/">Resource</a></li>
+                    <li><a target="_blank" href="/vm-test">MVVM-test</a></li>
+                    <li><a target="_blank" href="/todolist">todolist</a></li>
+                    <li><a target="_blank" href="/excel">OnlineTable</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/signout">Sign Out</a></li>
+                    <li><a href="/register">Register</a><li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div id="important" style="color:#E0FFFF; background-color:#4682B4; padding:30px 0; margin:-20px 0 20px 0;">
+        <div class="container">
+            <h1 style="color:#fff; font-size:60px">Webchatroom project by websocket</h1>
+            <p style="font-size:24px; line-height:48px">Very intresting</p>
+        </div>
+    </div>
+    {% block main %} {% endblock %}
+    <footer style="background-color:#ddd; padding: 20px 0;">
+        <div class="container">
+            <p>
+                <a target="_blank" href="https://www.douban.com/people/Otakuwizard/">Douban</a> -
+                <a target="_blank" href="https://github.com/michaelliao/learn-javascript">GitHub</a> -
+                <a target_"_blank" href="http://www.weibo.com/u/2319626291?refer_flag=1001030101_&is_hot=1">Weibo</a>
+            </p>
+            <p>This Weobsite is made by <a target="_blank" href="http://www.weibo.com/u/2319626291">@Feng Zijun</a></p>
+            <p>Code licensed <a target="_blank" href="https://github.com/michaelliao/learn-javascript/blob/master/LICENSE">Apache</a></p>
+        </div>
+    </footer>
+</body>
+</html>

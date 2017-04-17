@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block main %}
+<script>
+
+function validateEmail(email){
+    var re = /^[0-9a-z\.\-\_]+\@[0-9a-z\-\_]+\.[0-9a-z\-\_]{1,4}$/;
+    return re.test(email.toLowerCase());
+}
+$(function(){
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            name: '',
+            email: '',
+            password1: '',
+            password2: '',
+            sex: 'male'
+        }
+    });
+        /*method: {
+            submit: function(event){
+                event.preventDefault();
+                var
+                    gender,
+                    name,
+                    password,
+                    setting,
+                    $form = $('#vm'),
+                    email = this.email.trim().toLowerCase();
+                if(!this.name.trim()){
+                    return $form.showFormError('Please enter a name.');
+                }
+                if(!validateEmail(email)){
+                    return $form.showFromError('Invalid email');
+                }
+                if(this.password1.length < 6){
+                    return $form.showFormError('Your password is too short.');
+                }
+                if(this.password1 !== this.password2){
+                    return $form.showFormError('unique Password');
+                }
+                if(this.sex === 'male'){
+                    gender = true;
+                }else{
+                    gender = false;
+                }
+                name = this.name;
+                password = CryptoJS.SHA1(email + ':' + this.passwoord1);
+                setting = {
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        email: email,
+                        name: name,
+                        password: password,
+                        gender: gender
+                    },
+                    url: '/api/register',
+                    success: function(data){
+                        location.assign('/');
+                    }
+                };
+                $(this).ajaxSubmit(setting);
+
+                $form.postJSON('/api/register', {
+                    name: this.name,
+                    email: email,
+                    password: CryptoJS.SHA1(email + ':' + this.passwoord1),
+                    gender: gender
+                }, function(err, r){
+                    if(err){
+                        return $form.showFormError(err);
+                    }else{
+                        return location.assign('/');
+                    }
+                });
+            }
+        }
+    });*/
+    $('#vm').submit(function(event){
+        event.preventDefault();
+        var
+            gender,
+            name,
+            password,
+            setting,
+            $form = $(this),
+            alert = $('div.alert');
+            email = this.email.value.trim().toLowerCase();
+        if(!this.name.value.trim()){
+            return alert.text('Please enter a name.');
+        }
+        if(!validateEmail(email)){
+            return alert.text('Invalid email');
+        }
+        if(this.password1.value.length < 6){
+            return alert.text('Your password is too short.');
+        }
+        if(this.password1.value !== this.password2.value){
+            return alert.text('unique Password');
+        }
+        if(this.sex.value === 'male'){
+            gender = true;
+        }else{
+            gender = false;
+        }
+        name = this.name.value.trim();
+        password = CryptoJS.SHA1(email + ':' + this.password1.value).toString();
+        var data = {
+            name: name,
+            password: password,
+            email: email,
+            gender: gender
+        };
+        $form.postJSON('/api/register', data,function(err, r){
+            if(!err){
+                location.assign('/');
+            }
+        });
+        /*setting = {
+            type: 'post',
+            dataType: 'json',
+            data: {
+                email: email,
+                name: name,
+                password: password,
+                gender: gender
+            },
+            url: '/api/register',
+            success: function(data){
+                location.assign('/');
+            }
+        };
+        $form.ajaxSubmit(setting);
+        return false;*/
+    });
+});
+</script>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>WebSocket Chat</h1>
+            <div class="alert alert-danger">Please register.
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-titile"><span class="glyphicon glyphicon-user"></span> Please sign in</h3>
+                </div>
+                <div class="panel-body">
+                    <form id="vm">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input v-model="name" type="text" name="name" class="form-control" >
+                            <p class="help-block">Your username</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input v-model="email" type="text" name="email" class="form-control" placeholder="admin@example.com">
+                            <p class="help-block">Your email</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Password1</label>
+                            <input v-model="password1" type="password" name="password1" class="form-control" placeholder="************">
+                            <p class="help-block">Your password</p>
+                        </div>
+                        <div class="form-group">
+                            <label>password2</label>
+                            <input v-model="password2" type="password" name="password2" class="form-control" placeholder="***********">
+                            <p class="help-block">Repeat your password</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select v-model="sex" name="sex">
+                                <option value="male">male</option>
+                                <option value="female">female</option>
+                            </select>
+                            <p class="help-block">Your gender</p>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Sign In</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--<div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-titile"><span class="glyphicon glyphicon-hd-video"></span> Video training</h3>
+                </div>
+                <div class="panel-body">
+                    <video width="100%" controls="controls">
+                        <source src="/static/video/mijing.mp4">
+                    </video>
+                </div>
+            </div>
+        </div>-->
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block main %}
+
+
+
+<script>
+function showError(err){
+    alert('Error: ' + JSON.stringify(err));
+}
+
+$(function(){
+    var vm = new Vue({
+        el: '#vm-list',
+        data: {
+            title: '',
+            todos: [],
+            signined: false
+        },
+        created: function(){
+            this.init();
+        },
+        methods: {
+            init: function(){
+                var that = this;
+                var time = new Date();
+                var week = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                var dt = time.getFullYear() + '-' + (time.getMonth()+1) + '-' + time.getDate() + ' ' + week[time.getDay()];
+                this.title = dt;
+                that.$resource('/api/todolist').get().then(function(resp){
+                    resp.json().then(function(result){
+                        if(result.user_id){
+                            that.todos = result.todos;//?
+                            that.signined = true;
+                        }else{
+                            console.log('No user found');
+                        }
+                        if(!that.signined){
+                            $('#vmAdd').find('input[name=title]').attr('placeholder', 'You are not logined').attr('disabled', 'disabled');
+                            $('#vmAdd').find('input[name=content]').attr('disabled', 'disabled');
+                            $('#vmAdd').find('button').attr('disabled', 'disabled');
+                        }
+                    });
+                }, showError);
+            },
+
+            create: function(todo){
+                var that = this;
+                that.$resource('/api/todolist').save(todo).then(function(resp){
+                    resp.json().then(function(result){
+                        that.todos.push(result);
+                    });
+                }, showError);
+            },
+
+            update: function(todo, prop, e){
+                if(e.target.innerText === todo[prop]){
+                    return;
+                }
+                var that = this;
+                var t = {};
+                t[prop] = e.target.innerText;
+                var new_todo = Object.assign({}, todo, t);
+                that.$resource('/api/todolist').update(new_todo).then(function(resp){
+                    resp.json().then(function(result){
+                        var target = -1;
+                        for(let i in that.todos){
+                            if(that.todos[i].id === result.id){
+                                target = i;
+                                break;
+                            }
+                        }
+
+                        if(target >= 0){
+                            that.todos.splice(target, 1, result);
+                        }else{
+                            console.log('List not found');
+                        }
+                    });
+                }, showError);
+            },
+
+            remove: function(todo){
+                var that = this;
+                that.$resource('/api/todolist/' + todo.id).delete().then(function(resp){
+                    resp.json().then(function(result){
+                        var target = -1;
+                        for(let i in that.todos){
+                            if(that.todos[i].id === result.id){
+                                target = i;
+                                break;
+                            }
+                        }
+
+                        if(target >= 0){
+                            that.todos.splice(target, 1);
+                        }else{
+                            console.log('Remove failed');
+                        }
+                    });
+                }, showError);
+            }
+        }
+    });
+
+    window.vm = vm;
+
+     var vmAdd = new Vue({
+        el: '#vmAdd',
+        data: {
+            title: '',
+            content: ''
+        },
+        methods: {
+            submit: function () {
+                vm.create(this.$data);
+                this.title = '';
+                this.content = '';
+            }
+        }
+    });
+
+    window.vmAdd = vmAdd;
+});
+</script>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1> Make your own todolist</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"> ToDoList</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="vm-list">
+                        <h3 v-text="title"></h3>
+                        <li v-for="t in todos">
+                            <dl>
+                                <dt contenteditable="true" v-on:blur="update(t, 'title', $event)" v-text="t.title"></dt>
+                                <dd contenteditable="true" v-on:blur="update(t, 'content', $event)" v-text="t.content"></dd>
+                                <dd v-text="Date(t.updatedAt)"></dd>
+                                <dd><a href="#0" v-on:click="remove(t)">Delete</a></dd>
+                            </dt>
+                        </li>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2 class="panel-title"> Create a new Mission</h2>
+                </div>
+                <div class="panel-body">
+                    <form id="vmAdd" action="#0" v-on:submit.prevent="submit">
+                        <div class="form-group">
+                            <label>Create a title</label>
+                            <input type="text" name="title" v-model="title" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Create content</label>
+                            <input type="text" name="content" v-model="content" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-default">Done</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
